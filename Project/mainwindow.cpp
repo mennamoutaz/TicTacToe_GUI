@@ -10,6 +10,7 @@
 #include <sstream>
 #include <string>  // Standard string operations
 #include <QTextStream>  // For handling Qt's string input/output
+#include <QDebug>
 // Declare a global database connection
 sqlite3* db;
 // Function to convert time to string
