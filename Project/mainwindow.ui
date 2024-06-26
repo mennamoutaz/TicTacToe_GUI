@@ -27,7 +27,7 @@
        <string notr="true">ui-&gt;firstframe-&gt;setStyleSheet(&quot;background-color: rgb(33, 0, 49);&quot;); </string>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>6</number>
       </property>
       <widget class="QWidget" name="firstframe">
        <widget class="QLabel" name="label_3">
@@ -850,7 +850,7 @@
        <widget class="QLabel" name="statusLabel">
         <property name="geometry">
          <rect>
-          <x>218</x>
+          <x>210</x>
           <y>90</y>
           <width>371</width>
           <height>31</height>
@@ -858,6 +858,58 @@
         </property>
         <property name="text">
          <string/>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="showPlayer1StatsButton">
+        <property name="geometry">
+         <rect>
+          <x>70</x>
+          <y>460</y>
+          <width>80</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Player1Stats</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="showPlayer2StatsButton">
+        <property name="geometry">
+         <rect>
+          <x>640</x>
+          <y>460</y>
+          <width>80</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Player2Stats</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="logout">
+        <property name="geometry">
+         <rect>
+          <x>660</x>
+          <y>20</y>
+          <width>80</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>log out</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pg">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>20</y>
+          <width>80</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>New Game</string>
         </property>
        </widget>
       </widget>
