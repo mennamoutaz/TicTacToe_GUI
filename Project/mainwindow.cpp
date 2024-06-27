@@ -14,6 +14,7 @@
 #include <string>  // Standard string operations
 #include <QTextStream>
 #include <QTimer>
+#include <QDebug>
 // For handling Qt's string input/output
 // Declare a global database connection
 sqlite3* db;
