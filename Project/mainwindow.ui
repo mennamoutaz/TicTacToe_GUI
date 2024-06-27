@@ -27,7 +27,7 @@
        <string notr="true">ui-&gt;firstframe-&gt;setStyleSheet(&quot;background-color: rgb(33, 0, 49);&quot;); </string>
       </property>
       <property name="currentIndex">
-       <number>6</number>
+       <number>5</number>
       </property>
       <widget class="QWidget" name="firstframe">
        <widget class="QLabel" name="label_3">
@@ -716,16 +716,6 @@
         </property>
         <property name="text">
          <string>sign up</string>
-        </property>
-       </widget>
-       <widget class="QWidget" name="player2LoginFrame" native="true">
-        <property name="geometry">
-         <rect>
-          <x>40</x>
-          <y>30</y>
-          <width>120</width>
-          <height>80</height>
-         </rect>
         </property>
        </widget>
       </widget>

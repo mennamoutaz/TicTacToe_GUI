@@ -1,8 +1,7 @@
 #include "mainwindow.h"  // Include the main window class
 #include "ui_mainwindow.h"
 #include "aiplayer.h"
-#include "gameboard.h"
- // Include the UI definitions
+#include "gameboard.h" // Include the UI definitions
 #include <QMessageBox>  // For displaying message boxes
 #include <QInputDialog>  // For input dialogs
 #include <sqlite3.h>  // SQLite database
@@ -14,7 +13,6 @@
 #include <string>  // Standard string operations
 #include <QTextStream>
 #include <QTimer>
-#include <QDebug>
 // For handling Qt's string input/output
 // Declare a global database connection
 sqlite3* db;
@@ -29,6 +27,7 @@ std::string timeToString(std::chrono::system_clock::time_point timePoint) {
     oss << std::put_time(&tm, "%Y-%m-%d %H:%M:%S");  // Format the time using put_time
     return oss.str();  // Return the formatted time string
 }
+/***********************************************/
 
 // Function to hash a password using SHA-256
 uint64_t customHash(const std::string& str) {
@@ -43,12 +42,17 @@ uint64_t customHash(const std::string& str) {
 
     return hash;
 }
+/***************************************************/
 
 // Function to hash a password to a string
 std::string hashPassword(const std::string& password) {
     uint64_t hash = customHash(password);
     return std::to_string(hash);
 }
+
+
+/************************************************************/
+
 
 // Function to handle user signup
 std::string signup(sqlite3* db, const std::string& email, const std::string& password, const std::string& name, int age, const std::string& city) {
@@ -93,6 +97,8 @@ std::string signup(sqlite3* db, const std::string& email, const std::string& pas
 
 
 
+/***************************************************/
+
 void MainWindow::loadUserData(const std::string &email) {
     // SQL query to retrieve user data
     std::string sql = "SELECT name, age, total_games, pvp_win_count, pvp_lose_count, pvp_total_games ,last_login_date FROM players WHERE email = '" + email + "'";
@@ -128,6 +134,9 @@ void MainWindow::loadUserData(const std::string &email) {
     sqlite3_finalize(stmt);  // Finalize the statement
 }
 
+/***************************************************************/
+
+
 // Function to handle user login
 std::string login(sqlite3* db, const std::string& email, const std::string& password) {
     // SQL query to select password for a given email
@@ -161,6 +170,10 @@ std::string login(sqlite3* db, const std::string& email, const std::string& pass
     sqlite3_finalize(stmt);  // Finalize the statement to avoid memory leaks
     return resultEmail;
 }
+
+
+
+
 // Define the MainWindow class constructor and other components
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
@@ -268,9 +281,9 @@ connect(ui->logout, &QPushButton::clicked, this, &MainWindow::onlogoutClicked);
         }
     }
 
-
-
 }
+
+
 
 MainWindow::~MainWindow() {
     if (db) {
@@ -278,11 +291,11 @@ MainWindow::~MainWindow() {
     }
     delete ui;  // Clean up UI components
 }
+
+
+
+
 void MainWindow::initializeGame() {
-
-
-
-
 
         if (againstAI) {
             ui->statusLabel->setText("Player 1's Turn (X)");//Set the turn label text.
@@ -302,7 +315,7 @@ void MainWindow::initializeGame() {
         player2Symbol = 'X';
     }
 
-    currentPlayer = player1Symbol;
+    currentPlayer = 1;
     ui->statusLabel->setText("Player 1's turn");
     updateBoardUI();
 }
@@ -345,6 +358,7 @@ void MainWindow::makeAIMove()//Slot for AI's move.
      ai.makeMove(board);//Make the AI move.
     updateBoardUI();// Update the game board UI.
     if (checkGameState()) {
+
         return; // If the game is over, return immediately
     }
     currentPlayer = 1; // Switch back to Player 1
@@ -388,11 +402,17 @@ void MainWindow::updateBoardUI() {
         }
 
 }
+
+
+
 bool MainWindow::checkGameState()
 {
     int result = board.checkWin();
+    QString winner;
     if (result == 1) {
         QMessageBox::information(this, "Game Over", "Player 1 wins!");
+        winner ="Player 1 win";
+        askPlayAgain(winner);
         // Update statistics for both players (handleGameOutcome function)
         std::string emailPlayer1 = getLoggedInPlayerEmail(); // Replace with your logic
         std::string emailPlayer2 = getPlayer2Email(); // Replace with your logic
@@ -404,11 +424,15 @@ bool MainWindow::checkGameState()
     } else if (result == -1) {
         if (againstAI && currentPlayer == -1) {
             QMessageBox::information(this, "Game Over", "AI wins!");
+            winner ="AI win";
+            askPlayAgain(winner);
         } else {
             QMessageBox::information(this, "Game Over", "Player 2 wins!");
             // Update statistics for both players (handleGameOutcome function)
             std::string emailPlayer1 = getLoggedInPlayerEmail(); // Replace with your logic
             std::string emailPlayer2 = getPlayer2Email(); // Replace with your logic
+            winner ="Player 2 win";
+            askPlayAgain(winner);
             // Handle game win logic
             handleGameOutcome(emailPlayer1, emailPlayer2, 0, 1); // 1 means win
 
@@ -418,6 +442,9 @@ bool MainWindow::checkGameState()
         return true;
     } else if (result == 2) {
         QMessageBox::information(this, "Game Over", "It's a draw!");
+        winner ="It's a draw!";
+        askPlayAgain(winner);
+
         // Update statistics for both players (handleGameOutcome function)
         std::string emailPlayer1 = getLoggedInPlayerEmail(); // Replace with your logic
         std::string emailPlayer2 = getPlayer2Email(); // Replace with your logic
@@ -429,6 +456,8 @@ bool MainWindow::checkGameState()
     }
     return false;
 }
+/*************************************************************/
+
 
 bool MainWindow::getPlayerStats(const std::string& email, int& pvp_win_count, int& pvp_lose_count, int& pvp_total_games) {
     // Assuming you have an SQLite database connection
@@ -464,6 +493,10 @@ bool MainWindow::getPlayerStats(const std::string& email, int& pvp_win_count, in
     return true;
 }
 
+/**************************************************************************/
+
+
+
 void MainWindow::updatePlayerStats(const std::string& email, int pvp_win_count, int pvp_lose_count, int pvp_total_games) {
     // Assuming you have an SQLite database connection
     sqlite3_stmt* stmt;
@@ -493,7 +526,16 @@ void MainWindow::updatePlayerStats(const std::string& email, int pvp_win_count, 
     sqlite3_finalize(stmt);
 }
 
+/************************************************************************/
 
+void MainWindow::resetGame()
+{
+    board = GameBoard();
+    updateBoardUI();
+    initializeGame();
+}
+
+/**********************************************************************/
 
 
 void MainWindow::askPlayAgain(const QString& result) {
@@ -501,12 +543,13 @@ void MainWindow::askPlayAgain(const QString& result) {
     reply = QMessageBox::question(this, "Game Over", result + "\nDo you want to play again?",
                                   QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::Yes) {
-        initializeGame();
+        resetGame();
     } else {
         gameActive = false;
         ui->statusLabel->setText("Game over. Thanks for playing!");
     }
 }
+/***********************************************************/
 
 void MainWindow::handleGameOutcome(const std::string& player1Email, const std::string& player2Email, int gameStatus, int gameOutcome) {
     // Variables for player 1 statistics
@@ -739,8 +782,10 @@ void MainWindow::onPVPButtonClicked()
     if (ok && !text.isEmpty()) {
         if (text == "Yes") {
             ui->stackedWidget->setCurrentIndex(5);
+
         } else {
             ui->stackedWidget->setCurrentIndex(7);
+
         }
     }
 }
@@ -748,6 +793,7 @@ void MainWindow::onPVPButtonClicked()
 void MainWindow::onPlayer2LoginButtonClicked()
 {
     std::string emailPlayer2 = ui->player2EmailLineEdit->text().toStdString();
+
     std::string password = hashPassword(ui->player2PasswordLineEdit->text().toStdString());
 
     // Fetch email of Player 1 (You should have a member variable or a way to access it)
@@ -774,9 +820,9 @@ void MainWindow::onPlayer2LoginButtonClicked()
 }
 
 void MainWindow::onPlayer2SignupButtonClicked()
-{
+{    std::string password = hashPassword(ui->player2SignupPasswordLineEdit->text().toStdString());
     std::string email = ui->player2SignupEmailLineEdit->text().toStdString();
-    std::string password = hashPassword(ui->player2SignupPasswordLineEdit->text().toStdString());
+
     std::string name = ui->player2SignupNameLineEdit->text().toStdString();
     std::string city = ui->player2SignupCityLineEdit->text().toStdString();
     int age = ui->player2SignupAgeLineEdit->text().toInt();
@@ -823,6 +869,7 @@ void MainWindow::onlogoutClicked(){
 
     ui->stackedWidget->setCurrentIndex(0);}
 void MainWindow::onpgClicked() {
+    resetGame();
     ui-> player2SignupEmailLineEdit->clear();
     ui->player2SignupPasswordLineEdit->clear();
     ui->player2SignupNameLineEdit->clear();
@@ -831,4 +878,6 @@ void MainWindow::onpgClicked() {
     ui-> player2EmailLineEdit->clear();
     ui->player2PasswordLineEdit->clear();
     ui->stackedWidget->setCurrentIndex(4);
+
 }
+

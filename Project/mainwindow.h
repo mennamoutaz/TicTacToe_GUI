@@ -40,7 +40,6 @@ private slots:
     void onSwitchToPlayer2LoginButtonClicked();
 
 private:
-    friend class tests;
     Ui::MainWindow *ui; // Reference to the UI elements
     QFrame *player2LoginFrame; // Define QFrame pointer
     QFrame *player2SignupFrame; // Define QFrame pointer
@@ -61,6 +60,8 @@ private:
     void updateTurnLabel();
     void makeAIMove();
 
+    void resetGame();
+
     // Tic Tac Toe game logic
     GameBoard board;
     AIPlayer ai;
@@ -71,7 +72,7 @@ private:
      bool checkGameState();
      bool againstAI;
       int state;
-
+     friend class tests;
 
     char player1Symbol;
     char player2Symbol;
