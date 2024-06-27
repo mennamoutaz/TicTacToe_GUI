@@ -10,8 +10,8 @@ SOURCES += \
      ../Project/gameboard.cpp \
      ../Project/mainwindow.cpp \
        tst_unittests.cpp
-    shell.c \
-    sqlite3.c
+      shell.c \
+      sqlite3.c
 
 HEADERS += \
     ../Project/aiplayer.h \
