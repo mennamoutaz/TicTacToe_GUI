@@ -47,7 +47,7 @@ jobs:
 
       - name: Verify directory structure 
         shell: powershell
-        run: Get-ChildItem -Recurse tictactoegui
+        run: Get-ChildItem -Recurse Project
 
       - name: Build project
         shell: powershell
