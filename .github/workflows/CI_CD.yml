@@ -55,6 +55,57 @@ jobs:
           cd Project
           qmake Application.pro
           mingw32-make
+
+      - name: Verify moc.exe in PATH
+        shell: cmd
+        run: |
+          moc -v
+
+
+      - name: Generate MOC files
+        shell: cmd
+        run: |
+         cd UNITTESTx
+         moc ../Project/aiplayer.h -o moc_aiplayer.cpp
+         moc tst_unittests.cpp -o tst_unittests.moc
+
+
+      - name: Build unit tests
+        shell: powershell
+        run: |
+          cd UNITTESTx
+          qmake UNITTESTx.pro
+          mingw32-make
+
+      - name: List build directory contents
+        shell: powershell
+        run: |
+          cd UNITTESTx
+          Get-ChildItem -Recurse
+
+      - name: Verify and log directory structure
+        shell: powershell
+        run: |
+          cd UNITTESTx
+          Get-ChildItem -Recurse
+          if (-Not (Test-Path -Path "release")) {
+            throw "Release directory does not exist"
+          }
+          Get-ChildItem -Path "release"
+
+      - name: Run Tests
+        shell: powershell
+        continue-on-error: true
+        run: |
+          cd UNITTESTx/release
+          ./UNITTESTx.exe > test_output.log 2>&1
+
+      - name: Capture Test Output
+        if: failure()
+        shell: powershell
+        run: |
+          Write-Output "Test failed, capturing output..."
+          Get-Content -Path UNITTESTx/release/test_output.log -Tail 100
           
       - name: Run executable
         shell: powershell
