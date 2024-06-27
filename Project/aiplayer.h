@@ -1,30 +1,28 @@
 #ifndef AIPLAYER_H
 #define AIPLAYER_H
 
+#include "GameBoard.h"
 #include <vector>
-#include <QPushButton>
 
 struct TreeNode {
-    int moveIndex;
+    GameBoard board;
     std::vector<TreeNode*> children;
+    int moveRow;
+    int moveCol;
     int score;
 
-    TreeNode() : moveIndex(-1), score(0) {}
+    TreeNode() : moveRow(-1), moveCol(-1), score(0) {}
 };
 
 class AIPlayer {
 public:
-    AIPlayer(char symbol); // Constructor that accepts a symbol
-    void makeMove(std::vector<QPushButton*>& buttons);
+    void makeMove(GameBoard& board) const;
 
 private:
-    char playerSymbol; // Symbol assigned to AIPlayer ('X' or 'O')
-void buildTree(TreeNode* node, std::vector<QPushButton*>& buttons, int player); // Declaration of buildTree function
-    int minimax(TreeNode* node, std::vector<QPushButton*>& buttons, int alpha, int beta, bool maximizingPlayer, int depth);
-
-    int evaluate(const std::vector<QPushButton*>& buttons);
     friend class tests;
-    // Add any additional private methods or member variables as needed
+    void build_tree(TreeNode* node, int player) const;
+    int minimax(TreeNode* node, int alpha, int beta, bool is_max, int depth) const;
+    int evaluate(const GameBoard& board) const;
 };
 
 #endif // AIPLAYER_H

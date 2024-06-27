@@ -1,9 +1,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
+#include "gameboard.h"
+#include "aiplayer.h"
 #include <sqlite3.h> // SQLite database
 #include <string> // Standard string operations
 #include <QMainWindow>
-#include "aiplayer.h"
 #include <QFrame> // Include QFrame header from QtWidgets module
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -39,6 +40,7 @@ private slots:
     void onSwitchToPlayer2LoginButtonClicked();
 
 private:
+    friend class tests;
     Ui::MainWindow *ui; // Reference to the UI elements
     QFrame *player2LoginFrame; // Define QFrame pointer
     QFrame *player2SignupFrame; // Define QFrame pointer
@@ -51,25 +53,31 @@ private:
     void updatePlayerStats(const std::string& email, int pvp_win_count, int pvp_lose_count, int pvp_total_games);
     void checkGameStatus();
     void handleGameOutcome(const std::string& player1Email, const std::string& player2Email, int gameStatus, int gameOutcome);
-    void makeAIMove();
+
     void askPlayAgain(const QString& result);
     void handleGameWin(const std::string& player1Email, const std::string& player2Email);
     void handleGameDraw(const std::string& player1Email, const std::string& player2Email);
     void initializeGame(); // You should implement this function for game initialization
-    void onUserClickedButton(int index) ;
-    AIPlayer aiPlayer;
-    std::vector<QPushButton*> buttons;
+    void updateTurnLabel();
+    void makeAIMove();
+
     // Tic Tac Toe game logic
-    char board[3][3]; // 3x3 board for the game
-    char currentPlayer;
+    GameBoard board;
+    AIPlayer ai;
+    int currentPlayer;
+   /// 3x3 board for the game
+
     bool gameActive;
-    bool againstAI ;
-  std::vector<QPushButton*> buttonsVector; // Vector to hold pointers to all buttons representing the game board
+     bool checkGameState();
+     bool againstAI;
+      int state;
+
+
     char player1Symbol;
     char player2Symbol;
 
 
-     friend class tests;
+
 
     void updateBoardUI();
 };

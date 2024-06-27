@@ -1,41 +1,25 @@
 #include "aiplayer.h"
+#include "gameBoard.h"
 #include <limits>
 #include <iostream>
-#include <QPushButton>
 
-AIPlayer::AIPlayer(char symbol) : playerSymbol(symbol) {
-    // Constructor initialization
-}
-
-void AIPlayer::makeMove(std::vector<QPushButton*>& buttons) {
+void AIPlayer::makeMove(GameBoard& board) const {
     std::cout << "AI Move:" << std::endl;
-
-    // Create a TreeNode to build the game tree
     TreeNode* root = new TreeNode;
+    root->board = board;
+    build_tree(root, -1); // AI is player -1
 
-    // Build the game tree starting from the current board state
-    buildTree(root, buttons, -1); // Assuming AI is player -1
-
-    int bestScore = std::numeric_limits<int>::min();
-    TreeNode* bestMove = nullptr;
-
-    // Evaluate each possible move and choose the best one
+    int best_score = std::numeric_limits<int>::min();
+    TreeNode* best_move = nullptr;
     for (TreeNode* child : root->children) {
-        int score = minimax(child, buttons, std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), false, 9); // Adjust depth of search
-        if (score > bestScore) {
-            bestScore = score;
-            bestMove = child;
+        int score = minimax(child, std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), false, 9); // Adjust depth of search
+        if (score > best_score) {
+            best_score = score;
+            best_move = child;
         }
     }
 
-    // Apply AI move to the button
-    if (bestMove) {
-        int index = bestMove->moveIndex;
-        if (index >= 0 && index < buttons.size()) {
-            buttons[index]->setText(QString(playerSymbol)); // Set AI move to playerSymbol (either 'X' or 'O')
-            buttons[index]->setEnabled(false); // Disable button after AI move
-        }
-    }
+    board.setValue(best_move->moveRow, best_move->moveCol, -1); // AI's move
 
     // Free memory
     for (TreeNode* child : root->children) {
@@ -44,94 +28,68 @@ void AIPlayer::makeMove(std::vector<QPushButton*>& buttons) {
     delete root;
 }
 
-void AIPlayer::buildTree(TreeNode* node, std::vector<QPushButton*>& buttons, int player) {
-    // Iterate through each button to explore possible moves
-    for (int i = 0; i < buttons.size(); ++i) {
-        if (buttons[i]->text().isEmpty()) { // Check if button is empty
-            TreeNode* child = new TreeNode;
-            child->moveIndex = i;
-            node->children.push_back(child);
+void AIPlayer::build_tree(TreeNode* node, int player) const {
+    int winner = node->board.checkWin();
+    if (winner != 0) {
+        node->score = winner;
+        return;
+    }
 
-            // Simulate move on the button
-            buttons[i]->setText(QString(playerSymbol)); // Set AI move to playerSymbol (either 'X' or 'O')
-            buttons[i]->setEnabled(false); // Disable button after AI move
-
-            // Recursively build tree for further moves
-            buildTree(child, buttons, -player); // Toggle player for opponent's turn
-
-            // Undo move to explore other possibilities
-            buttons[i]->setText(""); // Clear button text
-            buttons[i]->setEnabled(true); // Enable button again
+    // Generate child nodes for possible moves
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            if (node->board.getValue(i, j) == 0) {
+                TreeNode* child = new TreeNode;
+                child->board = node->board;
+                child->board.setValue(i, j, player);
+                child->moveRow = i;
+                child->moveCol = j;
+                node->children.push_back(child);
+                build_tree(child, -player);
+            }
         }
     }
 }
 
-int AIPlayer::minimax(TreeNode* node, std::vector<QPushButton*>& buttons, int alpha, int beta, bool isMax, int depth) {
+int AIPlayer::minimax(TreeNode* node, int alpha, int beta, bool is_max, int depth) const {
     if (node->children.empty() || depth == 0) {
-        return evaluate(buttons); // Evaluate the board state based on buttons
+        return evaluate(node->board); // Evaluate the board state
     }
 
-    if (isMax) {
-        int maxScore = std::numeric_limits<int>::min();
+    if (is_max) {
+        int max_score = std::numeric_limits<int>::min();
         for (TreeNode* child : node->children) {
-            int score = minimax(child, buttons, alpha, beta, false, depth - 1);
-            maxScore = std::max(maxScore, score);
+            int score = minimax(child, alpha, beta, false, depth - 1);
+            max_score = std::max(max_score, score);
             alpha = std::max(alpha, score);
             if (alpha >= beta) {
                 break;
             }
         }
-        return maxScore;
+        return max_score;
     } else {
-        int minScore = std::numeric_limits<int>::max();
+        int min_score = std::numeric_limits<int>::max();
         for (TreeNode* child : node->children) {
-            int score = minimax(child, buttons, alpha, beta, true, depth - 1);
-            minScore = std::min(minScore, score);
+            int score = minimax(child, alpha, beta, true, depth - 1);
+            min_score = std::min(min_score, score);
             beta = std::min(beta, score);
             if (alpha >= beta) {
                 break;
             }
         }
-        return minScore;
+        return min_score;
     }
 }
 
-int AIPlayer::evaluate(const std::vector<QPushButton*>& buttons) {
-    // Evaluation criteria for Tic-Tac-Toe:
-    // - Check for potential wins, blocks, and prioritize based on game state
-
-    // Define winning patterns (indices for buttons)
-    const std::vector<std::vector<int>> winPatterns = {
-        {0, 1, 2}, {3, 4, 5}, {6, 7, 8}, // rows
-        {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, // columns
-        {0, 4, 8}, {2, 4, 6} // diagonals
-    };
-
-    int aiScore = 0;
-    int playerScore = 0;
-
-    // Evaluate each winning pattern
-    for (const auto& pattern : winPatterns) {
-        bool aiFound = true;
-        bool playerFound = true;
-
-        for (int index : pattern) {
-            if (buttons[index]->text() != QString(playerSymbol)) { // Check AI's symbol
-                aiFound = false;
-            }
-            if (buttons[index]->text() != (playerSymbol == 'X' ? "O" : "X")) { // Check player's symbol
-                playerFound = false;
-            }
-        }
-
-        if (aiFound) {
-            aiScore += 10; // Favorable score for AI winning pattern
-        }
-        if (playerFound) {
-            playerScore += 10; // Favorable score for player winning pattern
-        }
+int AIPlayer::evaluate(const GameBoard& board) const {
+    int result = board.checkWin();
+    if (result == 1) { // If player wins, return a low score
+        return -1000;
+    } else if (result == -1) { // If AI wins, return a high score
+        return 1000;
+    } else if (result == 2) { // If it's a draw, return 0
+        return 0;
     }
-
-    // Return the difference in scores (favoring AI's perspective)
-    return aiScore - playerScore;
+    // Otherwise, return a neutral score
+    return 0;
 }
