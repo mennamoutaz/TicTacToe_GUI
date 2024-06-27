@@ -61,6 +61,8 @@ public:
     QLabel *userLastLoginLabel;
     QLabel *userNameLabel2;
     QPushButton *PLAY;
+    QPushButton *showGameIdsButton;
+    QPushButton *return2;
     QWidget *signupframe;
     QLabel *label_5;
     QLabel *label_6;
@@ -81,6 +83,7 @@ public:
     QPushButton *pvpButton;
     QPushButton *pveButton;
     QFrame *pvpGameFrame;
+    QPushButton *return3;
     QWidget *player2LoginFrame_2;
     QLabel *Email;
     QLabel *Password;
@@ -89,7 +92,6 @@ public:
     QLineEdit *player2PasswordLineEdit;
     QPushButton *player2LoginButton;
     QPushButton *switchToPlayer2SignupButton;
-    QWidget *player2LoginFrame;
     QWidget *page_3;
     QPushButton *button_0_0;
     QPushButton *button_0_1;
@@ -105,6 +107,7 @@ public:
     QPushButton *showPlayer2StatsButton;
     QPushButton *logout;
     QPushButton *pg;
+    QPushButton *return4;
     QWidget *player2SignupFrame_2;
     QWidget *player2SignupFrame;
     QLabel *Name;
@@ -121,6 +124,17 @@ public:
     QLabel *player2SignupErrorLabel;
     QPushButton *switchToPlayer2LoginButton;
     QWidget *page_4;
+    QPushButton *pushButton_0_0;
+    QPushButton *pushButton_0_1;
+    QPushButton *pushButton_0_2;
+    QPushButton *pushButton_1_0;
+    QPushButton *pushButton_1_1;
+    QPushButton *pushButton_1_2;
+    QPushButton *pushButton_2_0;
+    QPushButton *pushButton_2_1;
+    QPushButton *pushButton_2_2;
+    QPushButton *mbm;
+    QPushButton *return5;
     QStatusBar *statusbar;
 
     void setupUi(QMainWindow *MainWindow)
@@ -231,7 +245,13 @@ public:
         userNameLabel2->setGeometry(QRect(120, 60, 311, 21));
         PLAY = new QPushButton(page);
         PLAY->setObjectName("PLAY");
-        PLAY->setGeometry(QRect(480, 420, 80, 24));
+        PLAY->setGeometry(QRect(610, 460, 80, 24));
+        showGameIdsButton = new QPushButton(page);
+        showGameIdsButton->setObjectName("showGameIdsButton");
+        showGameIdsButton->setGeometry(QRect(610, 50, 80, 24));
+        return2 = new QPushButton(page);
+        return2->setObjectName("return2");
+        return2->setGeometry(QRect(40, 490, 80, 18));
         stackedWidget->addWidget(page);
         signupframe = new QWidget();
         signupframe->setObjectName("signupframe");
@@ -294,6 +314,9 @@ public:
         pvpGameFrame->setGeometry(QRect(310, 300, 120, 80));
         pvpGameFrame->setFrameShape(QFrame::StyledPanel);
         pvpGameFrame->setFrameShadow(QFrame::Raised);
+        return3 = new QPushButton(page_2);
+        return3->setObjectName("return3");
+        return3->setGeometry(QRect(660, 400, 80, 18));
         stackedWidget->addWidget(page_2);
         player2LoginFrame_2 = new QWidget();
         player2LoginFrame_2->setObjectName("player2LoginFrame_2");
@@ -318,9 +341,6 @@ public:
         switchToPlayer2SignupButton = new QPushButton(player2LoginFrame_2);
         switchToPlayer2SignupButton->setObjectName("switchToPlayer2SignupButton");
         switchToPlayer2SignupButton->setGeometry(QRect(330, 20, 80, 24));
-        player2LoginFrame = new QWidget(player2LoginFrame_2);
-        player2LoginFrame->setObjectName("player2LoginFrame");
-        player2LoginFrame->setGeometry(QRect(40, 30, 120, 80));
         stackedWidget->addWidget(player2LoginFrame_2);
         page_3 = new QWidget();
         page_3->setObjectName("page_3");
@@ -366,6 +386,9 @@ public:
         pg = new QPushButton(page_3);
         pg->setObjectName("pg");
         pg->setGeometry(QRect(30, 20, 80, 24));
+        return4 = new QPushButton(page_3);
+        return4->setObjectName("return4");
+        return4->setGeometry(QRect(360, 520, 80, 18));
         stackedWidget->addWidget(page_3);
         player2SignupFrame_2 = new QWidget();
         player2SignupFrame_2->setObjectName("player2SignupFrame_2");
@@ -414,6 +437,39 @@ public:
         stackedWidget->addWidget(player2SignupFrame_2);
         page_4 = new QWidget();
         page_4->setObjectName("page_4");
+        pushButton_0_0 = new QPushButton(page_4);
+        pushButton_0_0->setObjectName("pushButton_0_0");
+        pushButton_0_0->setGeometry(QRect(81, 70, 80, 51));
+        pushButton_0_1 = new QPushButton(page_4);
+        pushButton_0_1->setObjectName("pushButton_0_1");
+        pushButton_0_1->setGeometry(QRect(200, 70, 80, 51));
+        pushButton_0_2 = new QPushButton(page_4);
+        pushButton_0_2->setObjectName("pushButton_0_2");
+        pushButton_0_2->setGeometry(QRect(320, 70, 80, 51));
+        pushButton_1_0 = new QPushButton(page_4);
+        pushButton_1_0->setObjectName("pushButton_1_0");
+        pushButton_1_0->setGeometry(QRect(80, 150, 80, 51));
+        pushButton_1_1 = new QPushButton(page_4);
+        pushButton_1_1->setObjectName("pushButton_1_1");
+        pushButton_1_1->setGeometry(QRect(200, 150, 80, 51));
+        pushButton_1_2 = new QPushButton(page_4);
+        pushButton_1_2->setObjectName("pushButton_1_2");
+        pushButton_1_2->setGeometry(QRect(320, 150, 80, 51));
+        pushButton_2_0 = new QPushButton(page_4);
+        pushButton_2_0->setObjectName("pushButton_2_0");
+        pushButton_2_0->setGeometry(QRect(80, 230, 80, 51));
+        pushButton_2_1 = new QPushButton(page_4);
+        pushButton_2_1->setObjectName("pushButton_2_1");
+        pushButton_2_1->setGeometry(QRect(200, 230, 80, 51));
+        pushButton_2_2 = new QPushButton(page_4);
+        pushButton_2_2->setObjectName("pushButton_2_2");
+        pushButton_2_2->setGeometry(QRect(320, 230, 80, 51));
+        mbm = new QPushButton(page_4);
+        mbm->setObjectName("mbm");
+        mbm->setGeometry(QRect(30, 20, 141, 18));
+        return5 = new QPushButton(page_4);
+        return5->setObjectName("return5");
+        return5->setGeometry(QRect(70, 450, 80, 18));
         stackedWidget->addWidget(page_4);
 
         gridLayout_4->addWidget(stackedWidget, 0, 0, 1, 1);
@@ -425,7 +481,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        stackedWidget->setCurrentIndex(6);
+        stackedWidget->setCurrentIndex(4);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -461,6 +517,8 @@ public:
         userLastLoginLabel->setText(QString());
         userNameLabel2->setText(QCoreApplication::translate("MainWindow", "<html><head/><body><p><span style=\" font-size:22pt;\"><br/></span></p></body></html>", nullptr));
         PLAY->setText(QCoreApplication::translate("MainWindow", "PLAY", nullptr));
+        showGameIdsButton->setText(QCoreApplication::translate("MainWindow", "Game IDs", nullptr));
+        return2->setText(QCoreApplication::translate("MainWindow", "return", nullptr));
         label_5->setText(QCoreApplication::translate("MainWindow", "Email", nullptr));
         label_6->setText(QCoreApplication::translate("MainWindow", "Password", nullptr));
         label_7->setText(QCoreApplication::translate("MainWindow", "Name", nullptr));
@@ -472,6 +530,7 @@ public:
         return1_2->setText(QCoreApplication::translate("MainWindow", "Return", nullptr));
         pvpButton->setText(QCoreApplication::translate("MainWindow", "player vs player", nullptr));
         pveButton->setText(QCoreApplication::translate("MainWindow", "player vs ai", nullptr));
+        return3->setText(QCoreApplication::translate("MainWindow", "return", nullptr));
         Email->setText(QCoreApplication::translate("MainWindow", "<html><head/><body><p><span style=\" font-size:14pt; font-weight:700;\">Email</span></p></body></html>", nullptr));
         Password->setText(QCoreApplication::translate("MainWindow", "<html><head/><body><p><span style=\" font-size:14pt; font-weight:700;\">Password</span></p></body></html>", nullptr));
         player2LoginErrorLabel->setText(QString());
@@ -491,6 +550,7 @@ public:
         showPlayer2StatsButton->setText(QCoreApplication::translate("MainWindow", "Player2Stats", nullptr));
         logout->setText(QCoreApplication::translate("MainWindow", "log out", nullptr));
         pg->setText(QCoreApplication::translate("MainWindow", "New Game", nullptr));
+        return4->setText(QCoreApplication::translate("MainWindow", "return", nullptr));
         Name->setText(QCoreApplication::translate("MainWindow", "<html><head/><body><p><span style=\" font-size:14pt; font-weight:700;\">Name</span></p></body></html>", nullptr));
         Email_2->setText(QCoreApplication::translate("MainWindow", "<html><head/><body><p><span style=\" font-size:14pt; font-weight:700;\">Email</span></p></body></html>", nullptr));
         Password_2->setText(QCoreApplication::translate("MainWindow", "<html><head/><body><p><span style=\" font-size:14pt; font-weight:700;\">Password</span></p></body></html>", nullptr));
@@ -499,6 +559,17 @@ public:
         player2SignupButton->setText(QCoreApplication::translate("MainWindow", "Signup", nullptr));
         player2SignupErrorLabel->setText(QString());
         switchToPlayer2LoginButton->setText(QCoreApplication::translate("MainWindow", "Login", nullptr));
+        pushButton_0_0->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
+        pushButton_0_1->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
+        pushButton_0_2->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
+        pushButton_1_0->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
+        pushButton_1_1->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
+        pushButton_1_2->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
+        pushButton_2_0->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
+        pushButton_2_1->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
+        pushButton_2_2->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
+        mbm->setText(QCoreApplication::translate("MainWindow", "show_move_by_move", nullptr));
+        return5->setText(QCoreApplication::translate("MainWindow", "return", nullptr));
     } // retranslateUi
 
 };

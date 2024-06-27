@@ -32,4 +32,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
-    tictactoe5.db
+    J:/projects/tablesss/tablesss/tictactoe24.db
