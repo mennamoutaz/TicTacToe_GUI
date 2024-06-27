@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     aiplayer.cpp \
+    gameboard.cpp \
     main.cpp \
     mainwindow.cpp \
     shell.c \
@@ -17,6 +18,7 @@ SOURCES += \
 
 HEADERS += \
     aiplayer.h \
+    gameboard.h \
     mainwindow.h \
     sqlite3.h \
     sqlite3ext.h
