@@ -9,12 +9,16 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    aiplayer.cpp \
+    gameboard.cpp \
     main.cpp \
     mainwindow.cpp \
     shell.c \
     sqlite3.c
 
 HEADERS += \
+    aiplayer.h \
+    gameboard.h \
     mainwindow.h \
     sqlite3.h \
     sqlite3ext.h
@@ -28,4 +32,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
-    tictactoe5.db
+    J:/projects/tablesss/tablesss/tictactoe24.db
