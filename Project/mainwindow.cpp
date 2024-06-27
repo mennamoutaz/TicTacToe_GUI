@@ -156,10 +156,15 @@ std::string login(sqlite3* db, const std::string& email, const std::string& pass
     return resultEmail;
 }
 // Define the MainWindow class constructor and other components
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent),
-    ui(new Ui::MainWindow) {
-    ui->setupUi(this);  // Set up the UI components
+MainWindow::MainWindow(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::MainWindow),
+    aiPlayer('O') // Initialize AIPlayer with 'O' symbol
+{
+    ui->setupUi(this);
+    for (QPushButton* button : buttonsVector) {
+        connect(button, SIGNAL(clicked()), this, SLOT(handleButtonClick()));
+    }
 
     // Set up the SQLite database connection
     if (sqlite3_open("tictactoe22.db", &db) != SQLITE_OK) {
@@ -187,6 +192,24 @@ MainWindow::MainWindow(QWidget *parent)
         "last_login_date TEXT" // Last login date
         "last_login_date TEXT" // Last login date
         ");";
+   const char* creategamesTableSQL =
+ "CREATE TABLE IF NOT EXISTS games ("
+       " id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        "player1_email TEXT NOT NULL,"
+        "player2_email TEXT NOT NULL,"
+        "start_time TEXT,"
+        "end_time TEXT,"
+        "result TEXT"
+        ");";
+const char* createmovesTableSQL =
+    "CREATE TABLE IF NOT EXISTS moves ("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        "game_id INTEGER NOT NULL,"
+        "board TEXT NOT NULL,"
+        "player_turn TEXT NOT NULL,"
+        "move_number INTEGER NOT NULL,"
+        "FOREIGN KEY (game_id) REFERENCES games(id)"
+              ");";
     char* errMsg = nullptr;
     if (sqlite3_exec(db, createPlayersTableSQL, nullptr, nullptr, &errMsg) != SQLITE_OK) {
         QMessageBox::critical(this, "Database Error", "Failed to create the 'players' table");
@@ -219,6 +242,15 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->player2SignupButton, &QPushButton::clicked, this, &MainWindow::onPlayer2SignupButtonClicked);
     connect(ui->switchToPlayer2SignupButton, &QPushButton::clicked, this, &MainWindow::onSwitchToPlayer2SignupButtonClicked);
     connect(ui->switchToPlayer2LoginButton, &QPushButton::clicked, this, &MainWindow::onSwitchToPlayer2LoginButtonClicked);
+connect(ui->logout, &QPushButton::clicked, this, &MainWindow::onlogoutClicked);
+    connect(ui->pg, &QPushButton::clicked, this, &MainWindow::onpgClicked);
+    // Connect the "Show Player 1 Stats" button to its slot
+    connect(ui->showPlayer1StatsButton, &QPushButton::clicked, this, &MainWindow::showPlayer1Stats);
+
+    // Connect the "Show Player 2 Stats" button to its slot
+    connect(ui->showPlayer2StatsButton, &QPushButton::clicked, this, &MainWindow::showPlayer2Stats);
+
+
     // Set the initial frame to the welcome frame
     ui->stackedWidget->setCurrentIndex(0);  // Index 0 for 'firstframe'
 
@@ -226,13 +258,14 @@ MainWindow::MainWindow(QWidget *parent)
         QString buttonName = "button" + QString::number(i);
         QPushButton* button = findChild<QPushButton*>(buttonName);
         if (button) {
+            buttons.push_back(button);
             connect(button, &QPushButton::clicked, this, &MainWindow::handleButtonClick);
         }
     }
-
-    initializeGame();
-
 }
+
+
+
 
 MainWindow::~MainWindow() {
     if (db) {
@@ -242,32 +275,73 @@ MainWindow::~MainWindow() {
 }
 void MainWindow::initializeGame() {
     memset(board, ' ', sizeof(board));
-    currentPlayer = 'X';
     gameActive = true;
-    ui->statusLabel->setText("Player X's turn");
+
+    if (!againstAI) {
+        QMessageBox::StandardButton reply = QMessageBox::question(this, "Choose Symbol", "Player 1, do you want to be X?",
+                                                                  QMessageBox::Yes | QMessageBox::No);
+        if (reply == QMessageBox::Yes) {
+            player1Symbol = 'X';
+            player2Symbol = 'O';
+        } else {
+            player1Symbol = 'O';
+            player2Symbol = 'X';
+        }
+
+        currentPlayer = player1Symbol;
+        ui->statusLabel->setText("Player 1's turn");
+    } else {
+        // Player vs AI mode setup
+        player1Symbol = 'X'; // Assuming player is always 'X' against AI
+        player2Symbol = 'O'; // AI is 'O'
+        currentPlayer = player1Symbol;
+        ui->statusLabel->setText("Your turn (X)");
+    }
+
     updateBoardUI();
 }
+
+
 void MainWindow::handleButtonClick() {
-    if (!gameActive) return;
+    if (!gameActive) return; // If game is not active, do nothing
 
     QPushButton* clickedButton = qobject_cast<QPushButton*>(sender());
-    if (!clickedButton) return;
+    if (!clickedButton) return; // If sender is not a QPushButton, do nothing
 
+    // Determine which button was clicked based on its name (assuming naming convention)
     QString buttonName = clickedButton->objectName();
-    int index = buttonName.right(1).toInt() - 1;
-    int row = index / 3;
-    int col = index % 3;
+    int index = buttonName.right(1).toInt() - 1; // Extract button index (0-8)
+    int row = index / 3; // Calculate row index (0-2)
+    int col = index % 3; // Calculate column index (0-2)
 
+    // Check if the selected cell on the board is empty (' ')
     if (board[row][col] == ' ') {
-        board[row][col] = currentPlayer;
-        updateBoardUI();
-        checkGameStatus();
-        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
-        if (gameActive) {
-            ui->statusLabel->setText(QString("Player %1's turn").arg(currentPlayer));
+        board[row][col] = currentPlayer; // Assign current player's symbol to the board
+        updateBoardUI(); // Update the UI to reflect the move
+        checkGameStatus(); // Check if the game has ended (win/draw)
+
+        // If it's player vs player mode and the game is still active
+        if (gameActive ) {
+            // Switch turns between player 1 and player 2
+            if (currentPlayer == player1Symbol&& !againstAI) {
+                currentPlayer =player2Symbol;
+            ui->statusLabel->setText( "Player 2's turn");
+        }else if (currentPlayer == player1Symbol&& againstAI) {
+                currentPlayer =player2Symbol;
+            ui->statusLabel->setText( "AI's turn (O)");
+                aiPlayer.makeMove(buttonsVector); // AI makes its move
+                updateBoardUI(); // Update UI after AI move
+                checkGameStatus(); // Check if the game has ended (win/draw)}
         }
-    }
-}
+        else{
+            currentPlayer = player1Symbol;
+            ui->statusLabel->setText("Player 1's turn");
+        }}
+    }}
+
+
+
+
 
 void MainWindow::updateBoardUI() {
     for (int i = 1; i <= 9; ++i) {
@@ -277,10 +351,16 @@ void MainWindow::updateBoardUI() {
         int row = index / 3;
         int col = index % 3;
         if (button) {
-            button->setText(QString(board[row][col]));
+            if (board[row][col] == 'X')
+                button->setText("X");
+            else if (board[row][col] == 'O')
+                button->setText("O");
+            else
+                button->setText(""); // Set to empty if space is blank
         }
     }
 }
+
 
 
 bool MainWindow::getPlayerStats(const std::string& email, int& pvp_win_count, int& pvp_lose_count, int& pvp_total_games) {
@@ -346,6 +426,7 @@ void MainWindow::updatePlayerStats(const std::string& email, int pvp_win_count, 
     sqlite3_finalize(stmt);
 }
 
+
 void MainWindow::checkGameStatus() {
     bool win = false;
     char winner = ' ';
@@ -391,7 +472,8 @@ void MainWindow::checkGameStatus() {
     // Update game status and player statistics
     if (win) {
         gameActive = false;
-        ui->statusLabel->setText(QString("Player %1 wins!").arg(winner));
+        QString result = QString("Player %1 wins!").arg(winner);
+        ui->statusLabel->setText(result);
 
         // Update statistics for both players
         std::string emailPlayer1 = getLoggedInPlayerEmail(); // Get email of Player 1
@@ -401,13 +483,16 @@ void MainWindow::checkGameStatus() {
             qDebug() << "Error: Player emails are not valid.";
             return;
         }
-
 
         // Handle game win logic
         handleGameOutcome(emailPlayer1, emailPlayer2, 1, 1); // 1 means win
+
+        // Ask if they want to play again
+        askPlayAgain(result);
     } else if (isDraw) {
         gameActive = false;
-        ui->statusLabel->setText("It's a draw!");
+        QString result = "It's a draw!";
+        ui->statusLabel->setText(result);
 
         // Update statistics for both players
         std::string emailPlayer1 = getLoggedInPlayerEmail(); // Get email of Player 1
@@ -415,17 +500,26 @@ void MainWindow::checkGameStatus() {
 
         if (emailPlayer1.empty() || emailPlayer2.empty()) {
             qDebug() << "Error: Player emails are not valid.";
-            return;
-        }
-
-        // Check if Player 2's email is the same as Player 1's email
-        if (emailPlayer2 == emailPlayer1) {
-            QMessageBox::critical(this, "Login Error", "Player 2 cannot have the same email as Player 1.");
             return;
         }
 
         // Handle game draw logic
         handleGameOutcome(emailPlayer1, emailPlayer2, 2, 0); // 2 means draw
+
+        // Ask if they want to play again
+        askPlayAgain(result);
+    }
+}
+
+void MainWindow::askPlayAgain(const QString& result) {
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Game Over", result + "\nDo you want to play again?",
+                                  QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        initializeGame();
+    } else {
+        gameActive = false;
+        ui->statusLabel->setText("Game over. Thanks for playing!");
     }
 }
 
@@ -468,6 +562,90 @@ void MainWindow::handleGameOutcome(const std::string& player1Email, const std::s
     updatePlayerStats(player1Email, pvp_win_count1, pvp_lose_count1, pvp_total_games1);
     updatePlayerStats(player2Email, pvp_win_count2, pvp_lose_count2, pvp_total_games2);
 }
+
+
+// Define the function to show player 1's statistics
+void MainWindow::showPlayer1Stats() {
+    // Get the email of player 1
+    std::string emailPlayer1 = getLoggedInPlayerEmail();
+
+    if (emailPlayer1.empty()) {
+        QMessageBox::warning(this, "Error", "Player 1 is not logged in");
+        return;
+    }
+
+    // SQL query to fetch player 1's statistics
+    std::string sql = "SELECT name, age, pvp_win_count, pvp_lose_count, pvp_total_games FROM players WHERE email = '" + emailPlayer1 + "'";
+    sqlite3_stmt *stmt;
+
+    // Prepare the SQL statement
+    if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+        QMessageBox::critical(this, "Database Error", "Failed to prepare the SQL statement");
+        return;
+    }
+
+    // Execute the query and display the statistics
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        std::string name = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0));
+        int age = sqlite3_column_int(stmt, 1);
+        int pvpWins = sqlite3_column_int(stmt, 2);
+        int pvpLosses = sqlite3_column_int(stmt, 3);
+        int pvpTotalGames = sqlite3_column_int(stmt, 4);
+
+        QMessageBox::information(this, "Player 1 Statistics", QString("Name: %1\nAge: %2\nPvP Wins: %3\nPvP Losses: %4\nTotal PvP Games: %5")
+                                                                  .arg(QString::fromStdString(name))
+                                                                  .arg(age)
+                                                                  .arg(pvpWins)
+                                                                  .arg(pvpLosses)
+                                                                  .arg(pvpTotalGames));
+    } else {
+        QMessageBox::warning(this, "Error", "Failed to retrieve player 1's statistics");
+    }
+
+    sqlite3_finalize(stmt);  // Finalize the statement to avoid memory leaks
+}
+
+// Define the function to show player 2's statistics
+void MainWindow::showPlayer2Stats() {
+    // Get the email of player 2
+    std::string emailPlayer2 = getPlayer2Email();
+
+    if (emailPlayer2.empty()) {
+        QMessageBox::warning(this, "Error", "Player 2 is not logged in");
+        return;
+    }
+
+    // SQL query to fetch player 2's statistics
+    std::string sql = "SELECT name, age, pvp_win_count, pvp_lose_count, pvp_total_games FROM players WHERE email = '" + emailPlayer2 + "'";
+    sqlite3_stmt *stmt;
+
+    // Prepare the SQL statement
+    if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+        QMessageBox::critical(this, "Database Error", "Failed to prepare the SQL statement");
+        return;
+    }
+
+    // Execute the query and display the statistics
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        std::string name = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0));
+        int age = sqlite3_column_int(stmt, 1);
+        int pvpWins = sqlite3_column_int(stmt, 2);
+        int pvpLosses = sqlite3_column_int(stmt, 3);
+        int pvpTotalGames = sqlite3_column_int(stmt, 4);
+
+        QMessageBox::information(this, "Player 2 Statistics", QString("Name: %1\nAge: %2\nPvP Wins: %3\nPvP Losses: %4\nTotal PvP Games: %5")
+                                                                  .arg(QString::fromStdString(name))
+                                                                  .arg(age)
+                                                                  .arg(pvpWins)
+                                                                  .arg(pvpLosses)
+                                                                  .arg(pvpTotalGames));
+    } else {
+        QMessageBox::warning(this, "Error", "Failed to retrieve player 2's statistics");
+    }
+
+    sqlite3_finalize(stmt);  // Finalize the statement to avoid memory leaks
+}
+
 
 void MainWindow::handleGameWin(const std::string& player1Email, const std::string& player2Email) {
     // Notify user of the win
@@ -557,9 +735,12 @@ void MainWindow::onPLAYClicked() {
 
 void MainWindow::onPVEButtonClicked()
 {
+    againstAI=true ;
     // Logic to start a Player vs AI game
     QMessageBox::information(this, "PVE", "Player vs AI mode selected!");
     // Navigate to the actual game frame for PvE
+    ui->stackedWidget->setCurrentIndex(6); // Replace with the actual name of your game frame widget
+    initializeGame(); // Initialize the game if needed
 }
 
 void MainWindow::onPVPButtonClicked()
@@ -640,4 +821,27 @@ std::string MainWindow::getLoggedInPlayerEmail() {
 std::string MainWindow::getPlayer2Email() {
     // Example function to get the email of Player 2
     return ui->player2EmailLineEdit->text().toStdString();
+}
+void MainWindow::onlogoutClicked(){
+    ui->signupEmailLineEdit->clear();
+    ui->signupPasswordLineEdit->clear();
+    ui->emailLineEdit->clear();
+    ui->passwordLineEdit->clear();
+    ui->signupNameLineEdit->clear();
+    ui->signupAgeLineEdit->clear();
+    ui->signupCityLineEdit->clear();
+    ui->userEmailLabel->clear();
+    ui-> player2EmailLineEdit->clear();
+    ui->player2PasswordLineEdit->clear();
+
+    ui->stackedWidget->setCurrentIndex(0);}
+void MainWindow::onpgClicked() {
+    ui-> player2SignupEmailLineEdit->clear();
+    ui->player2SignupPasswordLineEdit->clear();
+    ui->player2SignupNameLineEdit->clear();
+    ui->player2SignupAgeLineEdit->clear();
+    ui->player2SignupCityLineEdit->clear();
+    ui-> player2EmailLineEdit->clear();
+    ui->player2PasswordLineEdit->clear();
+    ui->stackedWidget->setCurrentIndex(4);
 }

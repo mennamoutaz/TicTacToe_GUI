@@ -101,6 +101,10 @@ public:
     QPushButton *button8;
     QPushButton *button9;
     QLabel *statusLabel;
+    QPushButton *showPlayer1StatsButton;
+    QPushButton *showPlayer2StatsButton;
+    QPushButton *logout;
+    QPushButton *pg;
     QWidget *player2SignupFrame_2;
     QWidget *player2SignupFrame;
     QLabel *Name;
@@ -349,7 +353,19 @@ public:
         button9->setGeometry(QRect(450, 290, 71, 61));
         statusLabel = new QLabel(page_3);
         statusLabel->setObjectName("statusLabel");
-        statusLabel->setGeometry(QRect(218, 90, 371, 31));
+        statusLabel->setGeometry(QRect(210, 90, 371, 31));
+        showPlayer1StatsButton = new QPushButton(page_3);
+        showPlayer1StatsButton->setObjectName("showPlayer1StatsButton");
+        showPlayer1StatsButton->setGeometry(QRect(70, 460, 80, 24));
+        showPlayer2StatsButton = new QPushButton(page_3);
+        showPlayer2StatsButton->setObjectName("showPlayer2StatsButton");
+        showPlayer2StatsButton->setGeometry(QRect(640, 460, 80, 24));
+        logout = new QPushButton(page_3);
+        logout->setObjectName("logout");
+        logout->setGeometry(QRect(660, 20, 80, 24));
+        pg = new QPushButton(page_3);
+        pg->setObjectName("pg");
+        pg->setGeometry(QRect(30, 20, 80, 24));
         stackedWidget->addWidget(page_3);
         player2SignupFrame_2 = new QWidget();
         player2SignupFrame_2->setObjectName("player2SignupFrame_2");
@@ -409,7 +425,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        stackedWidget->setCurrentIndex(1);
+        stackedWidget->setCurrentIndex(6);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -471,6 +487,10 @@ public:
         button8->setText(QString());
         button9->setText(QString());
         statusLabel->setText(QString());
+        showPlayer1StatsButton->setText(QCoreApplication::translate("MainWindow", "Player1Stats", nullptr));
+        showPlayer2StatsButton->setText(QCoreApplication::translate("MainWindow", "Player2Stats", nullptr));
+        logout->setText(QCoreApplication::translate("MainWindow", "log out", nullptr));
+        pg->setText(QCoreApplication::translate("MainWindow", "New Game", nullptr));
         Name->setText(QCoreApplication::translate("MainWindow", "<html><head/><body><p><span style=\" font-size:14pt; font-weight:700;\">Name</span></p></body></html>", nullptr));
         Email_2->setText(QCoreApplication::translate("MainWindow", "<html><head/><body><p><span style=\" font-size:14pt; font-weight:700;\">Email</span></p></body></html>", nullptr));
         Password_2->setText(QCoreApplication::translate("MainWindow", "<html><head/><body><p><span style=\" font-size:14pt; font-weight:700;\">Password</span></p></body></html>", nullptr));
