@@ -5,18 +5,39 @@ CONFIG -= app_bundle
 
 TEMPLATE = app
 
-SOURCES +=  tst_unittests.cpp \
-    ../../Desktop/elhamdullahfinalfinal/elhamdullah4/aiplayer.cpp \
-    ../../Desktop/elhamdullahfinalfinal/elhamdullah4/gameboard.cpp \
+SOURCES += \
+     ../Project/aiplayer.cpp \
+     ../Project/gameboard.cpp \
+     ../Project/mainwindow.cpp \
+       tst_unittests.cpp
     shell.c \
     sqlite3.c
 
 HEADERS += \
-    ../../Desktop/elhamdullahfinalfinal/elhamdullah4/aiplayer.h \
-    ../../Desktop/elhamdullahfinalfinal/elhamdullah4/gameboard.h \
+    ../Project/aiplayer.h \
+    ../Project/gameboard.h \
+    ../Project/mainwindow.h \
     sqlite3.h \
     sqlite3ext.h
+    
+SOURCES += tst_unittests.moc
+
 
 DISTFILES += \
     sqlite3.def \
     sqlite3.dll
+
+FORMS += \
+    ../Project/mainwindow.ui
+    
+    # Include path to Qt headers
+INCLUDEPATH += $$PWD/../../Qt/5.15.2/mingw81_64/include
+
+# Ensure linking with necessary Qt libraries
+LIBS += -L$$PWD/../../Qt/5.15.2/mingw81_64/lib \
+    -lQt5Test
+
+QMAKE_CXXFLAGS += $$QMAKE_CXXFLAGS_WARN_ON
+
+# Define the target name
+TARGET = UNITTESTx
