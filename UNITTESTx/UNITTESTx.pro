@@ -39,4 +39,4 @@ LIBS += -L$$PWD/../../Qt/5.15.2/mingw81_64/lib \
 QMAKE_CXXFLAGS += $$QMAKE_CXXFLAGS_WARN_ON
 
 # Define the target name
-TARGET = Application
+TARGET = UNITTESTx
