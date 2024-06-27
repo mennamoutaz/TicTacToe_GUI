@@ -9,25 +9,6 @@ GameBoard::GameBoard() {
     }
 }
 
-void GameBoard::display() const {
-    std::cout << "  1 2 3 " << std::endl;
-    std::cout << " -------" << std::endl;
-    for (int i = 0; i < 3; ++i) {
-        std::cout << i + 1 << "|";
-        for (int j = 0; j < 3; ++j) {
-            if (board[i][j] == 1) {
-                std::cout << "X ";
-            } else if (board[i][j] == -1) {
-                std::cout << "O ";
-            } else {
-                std::cout << "- ";
-            }
-        }
-        std::cout << std::endl;
-    }
-    std::cout << " -------" << std::endl;
-}
-
 int GameBoard::checkWin() const {
     // Check rows
     for (int i = 0; i < 3; ++i) {

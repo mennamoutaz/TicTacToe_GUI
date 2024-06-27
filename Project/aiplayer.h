@@ -19,7 +19,6 @@ public:
     void makeMove(GameBoard& board) const;
 
 private:
-    friend class tests;
     void build_tree(TreeNode* node, int player) const;
     int minimax(TreeNode* node, int alpha, int beta, bool is_max, int depth) const;
     int evaluate(const GameBoard& board) const;
