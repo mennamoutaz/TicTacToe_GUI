@@ -14,9 +14,9 @@ SOURCES += \
     sqlite3.c
 
 HEADERS += \
-    ../tictactoegui/aiplayer.h \
-    ../tictactoegui/gameboard.h \
-    ../tictactoegui/mainwindow.h \
+    ../Project/aiplayer.h \
+    ../Project/gameboard.h \
+    ../Project/mainwindow.h \
     sqlite3.h \
     sqlite3ext.h
 
